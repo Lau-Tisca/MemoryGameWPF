@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MemoryGameWPF.ViewModels;
 
 namespace MemoryGameWPF.Views
 {
@@ -23,7 +24,7 @@ namespace MemoryGameWPF.Views
         public SignInView()
         {
             InitializeComponent();
-            //DataContext = new SignInViewModel();
+            DataContext = new SignInViewModel();
         }
     }
 }

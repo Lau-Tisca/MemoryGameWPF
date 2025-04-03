@@ -30,13 +30,13 @@
                  Width="150" Margin="10"
                  ItemsSource="{Binding Users}"
                  DisplayMemberPath="UserName"
-                 SelectedItem="{Binding SignInViewModel.SelectedUser, Mode=TwoWay}"  />
+                 SelectedItem="{Binding SelectedUser, Mode=TwoWay}"  />
         <!-- DataBinding for Selected User -->
 
         <Image Grid.Row="1" Grid.Column="1"
                Name="UserImage"
                Width="200" Height="200" Margin="10"
-               Source="{Binding SignInViewModel.ImagePath}" />
+               Source="{Binding ImagePath}" />
         <!-- DataBinding for User Image -->
 
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">

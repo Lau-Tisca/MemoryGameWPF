@@ -46,6 +46,11 @@ namespace MemoryGameWPF.ViewModels
             }
         }
 
+        public string ImagePath
+        {
+            get { return SelectedUser?.ImagePath; } // Return the image path of the selected user
+        }
+
         private void UpdateCommandStates()
         {
             // Logic to enable/disable buttons based on SelectedUser
