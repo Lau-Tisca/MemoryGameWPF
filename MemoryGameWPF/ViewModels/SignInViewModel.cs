@@ -42,6 +42,7 @@ namespace MemoryGameWPF.ViewModels
             {
                 _selectedUser = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ImagePath));
                 UpdateCommandStates(); // Update button enabled states when selection changes
             }
         }
@@ -72,9 +73,9 @@ namespace MemoryGameWPF.ViewModels
         {
             new User("Corina", "../Images/lion.jpg"),
             new User("Raul", "pack://application:,,,/MemoryGameWPF;component/Images/cat.jpg"),
-            new User("Simona", "Images/dog.gif"),
-            new User("Maria", "Images/panda.png"),
-            new User("Andrei", "Images/tiger.jpg")
+            new User("Simona", "../Images/dog.jpg"),
+            new User("Maria", "../Images/panda.jpg"),
+            new User("Andrei", "../Images/tiger.jpg")
         };
 
             //NewUserCommand = new RelayCommand(ExecuteNewUser);

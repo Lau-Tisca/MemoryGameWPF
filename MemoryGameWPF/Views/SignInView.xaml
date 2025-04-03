@@ -21,9 +21,9 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                   Text="Sign In" HorizontalAlignment="Center" FontSize="24" Margin="10"/>
+                   Text="Welcome! Enjoy this game!" HorizontalAlignment="Center" FontSize="24" Margin="10"/>
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" VerticalAlignment="Bottom"
-                   Text="Welcome! Enjoy this game!" HorizontalAlignment="Center" Margin="10"/>
+                   Text="" HorizontalAlignment="Center" Margin="10"/>
 
         <ListBox Grid.Row="1" Grid.Column="0"
                  Name="UserListBox"
