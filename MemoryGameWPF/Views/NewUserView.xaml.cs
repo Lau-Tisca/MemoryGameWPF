@@ -17,9 +17,9 @@ namespace MemoryGameWPF.Views
     /// <summary>
     /// Interaction logic for NewUser.xaml
     /// </summary>
-    public partial class NewUser : Window
+    public partial class NewUserView : Window
     {
-        public NewUser()
+        public NewUserView()
         {
             InitializeComponent();
         }
