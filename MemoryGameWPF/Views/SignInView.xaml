@@ -35,8 +35,8 @@
 
         <Image Grid.Row="1" Grid.Column="1"
                Name="UserImage"
-               Width="200" Height="200" Margin="10"
-               Source="{Binding ImagePath}" />
+               Width="200" Height="200" Margin="215,73,215,75"
+               Source="{Binding SelectedUser.ImagePath}" />
         <!-- DataBinding for User Image -->
 
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">

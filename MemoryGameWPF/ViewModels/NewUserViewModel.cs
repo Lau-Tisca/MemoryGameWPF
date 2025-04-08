@@ -27,6 +27,7 @@ namespace MemoryGameWPF.ViewModels
             {
                 _userName = value;
                 OnPropertyChanged();
+                SaveUserCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -61,7 +62,7 @@ namespace MemoryGameWPF.ViewModels
         public NewUserViewModel()
         {
             BrowseImageCommand = new RelayCommand<object>(ExecuteBrowseImage);
-            SaveUserCommand = new RelayCommand<object>(ExecuteSaveUser);
+            SaveUserCommand = new RelayCommand<object>(ExecuteSaveUser, CanExecuteSaveUser);
             CancelNewUserCommand = new RelayCommand<object>(ExecuteCancelNewUser);
 
             // Initialize with default values if needed
@@ -149,8 +150,9 @@ namespace MemoryGameWPF.ViewModels
 
         private bool CanExecuteSaveUser(object parameter)
         {
-            // Enable Save only if username is entered and an image is selected
-            return !string.IsNullOrWhiteSpace(UserName) && !string.IsNullOrEmpty(SelectedImagePath);
+            bool hasUserName = !string.IsNullOrWhiteSpace(UserName);
+            bool hasImagePath = !string.IsNullOrEmpty(SelectedImagePath);
+            return hasUserName && hasImagePath;
         }
 
         private void ExecuteCancelNewUser(object parameter)
