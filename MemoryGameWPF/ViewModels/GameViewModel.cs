@@ -10,14 +10,27 @@ using System.Windows.Input; // For ICommand (later)
 using System.Reflection; // For Assembly.GetExecutingAssembly (optional, for pathing)
 using GalaSoft.MvvmLight.Command;
 using System.Windows; // For RelayCommand (optional, for command binding)
+using System.Threading.Tasks; // For Task.Delay
+using System.Windows.Threading; // For DispatcherTimer
 
 namespace MemoryGameWPF.ViewModels
 {
     public class GameViewModel : INotifyPropertyChanged
     {
-        #region Fields & Properties
+        #region Fields
 
         private readonly Random _random = new Random(); // For shuffling
+        private List<CardViewModel> _currentlyFlippedCards = new List<CardViewModel>(); // Track flipped cards
+        private bool _isCheckingPair = false; // Flag to prevent clicking during pair check delay
+
+        // Timer Fields
+        private DispatcherTimer _gameTimer;
+        private TimeSpan _timeRemaining;
+        private bool _isGameActive = false; // To control timer starting/stopping
+
+        #endregion
+
+        #region Properties
 
         private ObservableCollection<CardViewModel> _gameBoardCards;
         public ObservableCollection<CardViewModel> GameBoardCards
@@ -79,8 +92,21 @@ namespace MemoryGameWPF.ViewModels
         // Helper property for UI display (optional)
         public string BoardSizeDescription => $"{Rows} x {Columns}";
 
-        // --- Board Representation (Placeholder for now) ---
-        // We will add ObservableCollection<CardViewModel> here later
+        // Timer Property for UI Binding
+        public TimeSpan TimeRemaining
+        {
+            get => _timeRemaining;
+            private set // Private setter, controlled by timer logic
+            {
+                _timeRemaining = value;
+                OnPropertyChanged();
+                // Optional: Update formatted string property too
+                OnPropertyChanged(nameof(TimeRemainingFormatted));
+            }
+        }
+
+        // Optional Formatted Time for Cleaner UI Display
+        public string TimeRemainingFormatted => $"Time: {_timeRemaining:mm\\:ss}"; // Format as MM:SS
 
         #endregion
 
@@ -93,7 +119,7 @@ namespace MemoryGameWPF.ViewModels
         public RelayCommand<object> NewGameCommand { get; }
         #endregion
 
-        // --- Constructor ---
+        #region Constructor
         public GameViewModel(User currentUser)
         {
             CurrentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
@@ -114,16 +140,13 @@ namespace MemoryGameWPF.ViewModels
             // TODO: Initialize other commands (Options, Save, Load etc.)
             // Example (implement methods later):
             // SetStandardOptionsCommand = new RelayCommand<object>(ExecuteSetStandardOptions);
+            _currentlyFlippedCards = new List<CardViewModel>(2);
+
+            InitializeTimer();
         }
+        #endregion
 
         #region Methods
-
-        // Add to Methods region in GameViewModel.cs
-        private void HandleCardClicked(CardViewModel clickedCard)
-        {
-            System.Diagnostics.Debug.WriteLine($"Card Clicked: ID={clickedCard.CardId}, Path={clickedCard.ImagePath}");
-            // TODO: Implement game logic here (flipping, matching)
-        }
 
         private void LoadImagePathsForCategory()
         {
@@ -150,7 +173,7 @@ namespace MemoryGameWPF.ViewModels
                 switch (SelectedCategory)
                 {
                     case "Animals":
-                        imageNames.AddRange(new[] { "cat.png", "dog.jpg", "lion.jpg", "panda.png", "tiger.jpg", "elephant.png", "giraffe.jpg", "monkey.png", "zebra.jpg", "bear.png", "fox.jpg", "hippo.png", "kangaroo.jpg", "koala.png", "owl.jpg", "penguin.png", "rabbit.jpg", "wolf.png" }); // Need at least 18 for 6x6
+                        imageNames.AddRange(new[] { "cat.jpg", "dog.jpg", "lion.jpg", "panda.jpg", "tiger.jpg", "elephant.png", "giraffe.jpg", "monkey.png", "zebra.jpg", "bear.png", "fox.jpg", "hippo.png", "kangaroo.jpg", "koala.png", "owl.jpg", "penguin.png", "rabbit.jpg", "wolf.jpg" }); // Need at least 18 for 6x6
                         break;
                     case "Nature":
                         imageNames.AddRange(new[] { "beach.jpg", "desert.png", "forest.jpg", "island.png", "lake.jpg", "mountain.png", "ocean.jpg", "river.png", "sunrise.jpg", "sunset.png", "tree.jpg", "valley.png", "volcano.jpg", "waterfall.png", "aurora.jpg", "canyon.png", "glacier.jpg", "meadow.png" }); // Need 18
@@ -193,6 +216,71 @@ namespace MemoryGameWPF.ViewModels
         private void ExecuteNewGame(object parameter)
         {
             InitializeNewGame();
+        }
+
+        private void InitializeTimer()
+        {
+            if (_gameTimer == null)
+            {
+                _gameTimer = new DispatcherTimer();
+                _gameTimer.Interval = TimeSpan.FromSeconds(1); // Tick every second
+                _gameTimer.Tick += GameTimer_Tick;
+            }
+            // Reset state even if timer existed
+            _gameTimer.Stop();
+            TimeRemaining = GetDefaultGameTime(); // Set initial time
+            _isGameActive = false;
+        }
+
+        private TimeSpan GetDefaultGameTime()
+        {
+            // TODO: Allow this to be configurable via Options later
+            // For now, fixed time based on board size (e.g., more time for bigger boards)
+            int totalSeconds = 30 + (Rows * Columns * 2); // Example calculation
+            return TimeSpan.FromSeconds(totalSeconds);
+        }
+
+        private void StartTimer()
+        {
+            if (_gameTimer != null && !_gameTimer.IsEnabled)
+            {
+                System.Diagnostics.Debug.WriteLine($"Starting timer with {TimeRemaining}");
+                _isGameActive = true;
+                _gameTimer.Start();
+            }
+        }
+
+        private void StopTimer()
+        {
+            if (_gameTimer != null && _gameTimer.IsEnabled)
+            {
+                System.Diagnostics.Debug.WriteLine("Stopping timer.");
+                _gameTimer.Stop();
+                _isGameActive = false;
+            }
+        }
+
+        private void GameTimer_Tick(object sender, EventArgs e)
+        {
+            if (!_isGameActive) return; // Should not happen if timer is stopped, but safety check
+
+            TimeRemaining = TimeRemaining.Subtract(TimeSpan.FromSeconds(1));
+
+            if (TimeRemaining <= TimeSpan.Zero)
+            {
+                // --- Time Ran Out ---
+                StopTimer();
+                TimeRemaining = TimeSpan.Zero; // Ensure it shows 00:00
+                System.Diagnostics.Debug.WriteLine("Game Over - Time Ran Out!");
+
+                // Disable remaining cards visually (optional) - could iterate GameBoardCards
+                // foreach(var card in GameBoardCards.Where(c => !c.IsMatched)) { card.IsEnabled = false; } // Requires IsEnabled property on CardViewModel OR handle in Style
+
+                MessageBox.Show($"Sorry {CurrentUser.UserName}, you ran out of time!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Stop);
+
+                // TODO: Update statistics (played game, but didn't win)
+                // UpdateStats(won: false);
+            }
         }
 
         // Core logic to set up a new game board
@@ -249,13 +337,26 @@ namespace MemoryGameWPF.ViewModels
                 GameBoardCards.Add(card);
             }
 
-            // 6. TODO: Reset game state (timer, moves counter, flipped cards tracker etc.)
-            //    (We'll add fields/properties for these later)
-            //    ResetFlippedCards();
-            //    ResetTimer();
-            //    StartTimer(); // If implementing timer
+            // 6. Reset game state & Timer
+            _currentlyFlippedCards.Clear();
+            _isCheckingPair = false;
+            _isGameActive = false; // Ensure game isn't active before timer reset
+            // TODO: Reset moves/score counters
 
-            System.Diagnostics.Debug.WriteLine($"Game board initialized with {GameBoardCards.Count} cards.");
+            // Reset timer to default duration and start it
+            InitializeTimer(); // Resets TimeRemaining and stops timer if running
+            StartTimer(); // Start the countdown
+
+            // Ensure cards are playable (needed if previous game ended by time out and disabled cards)
+            foreach (var card in GameBoardCards)
+            {
+                card.IsFlipped = false;
+                card.IsMatched = false;
+                // Make sure FlipCardCommand CanExecute is re-evaluated if it depends on IsEnabled property
+                card.FlipCardCommand.RaiseCanExecuteChanged();
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Game board initialized with {GameBoardCards.Count} cards. Timer started.");
         }
 
         // Helper method to shuffle a list (Fisher-Yates algorithm)
@@ -275,6 +376,88 @@ namespace MemoryGameWPF.ViewModels
         // --- TODO: Implement Command Execute Methods ---
         // private void ExecuteSetStandardOptions(object param) { Rows = 4; Columns = 4; }
         // etc.
+
+        // Callback method for when a card is clicked
+        private async void HandleCardClicked(CardViewModel clickedCard) // Make async for Task.Delay
+        {
+            // Ignore clicks if already checking a pair or card is already flipped/matched or timer is not active
+            if (!_isGameActive || _isCheckingPair || clickedCard.IsFlipped || clickedCard.IsMatched)
+            {
+                return;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Handling Click: ID={clickedCard.CardId}");
+
+            // Flip the clicked card
+            clickedCard.IsFlipped = true;
+
+            // Add to tracked flipped cards
+            _currentlyFlippedCards.Add(clickedCard);
+
+            // Check if two cards are now flipped
+            if (_currentlyFlippedCards.Count == 2)
+            {
+                _isCheckingPair = true; // Prevent further clicks during check
+                CardViewModel card1 = _currentlyFlippedCards[0];
+                CardViewModel card2 = _currentlyFlippedCards[1];
+
+                // TODO: Increment move counter here
+
+                // Compare CardId for a match
+                if (card1.CardId == card2.CardId)
+                {
+                    // --- Match Found ---
+                    System.Diagnostics.Debug.WriteLine($"Match Found: ID={card1.CardId}");
+                    // Mark both as matched
+                    card1.IsMatched = true;
+                    card2.IsMatched = true;
+
+                    // Clear the flipped cards tracker
+                    _currentlyFlippedCards.Clear();
+                    _isCheckingPair = false; // Allow clicks again
+
+                    CheckIfGameWon();
+                }
+                else
+                {
+                    // --- No Match ---
+                    System.Diagnostics.Debug.WriteLine($"No Match: ID={card1.CardId} vs ID={card2.CardId}");
+                    // Wait for a short period so the user can see the second card
+                    await Task.Delay(1000); // Wait for 1 second 
+
+                    // Flip both cards back down (only if they haven't been matched by some other rapid interaction - unlikely)
+                    if (!card1.IsMatched) card1.IsFlipped = false;
+                    if (!card2.IsMatched) card2.IsFlipped = false;
+
+                    // Clear the flipped cards tracker
+                    _currentlyFlippedCards.Clear();
+                    _isCheckingPair = false; // Allow clicks again
+                }
+            }
+            else if (_currentlyFlippedCards.Count > 2)
+            {
+                // This case shouldn't ideally happen if _isCheckingPair works,
+                // but as a fallback, clear the list and flip back extras if needed.
+                System.Diagnostics.Debug.WriteLine("Warning: More than 2 cards flipped unexpectedly.");
+                // Consider flipping back all in _currentlyFlippedCards except perhaps the last one?
+                _currentlyFlippedCards.Clear(); // Reset state
+                _isCheckingPair = false;
+            }
+        }
+
+        // Placeholder for checking win condition
+        private void CheckIfGameWon()
+        {
+            bool allMatched = GameBoardCards.All(card => card.IsMatched);
+            if (allMatched && GameBoardCards.Any() && _isGameActive) // Only count win if game was active
+            {
+                System.Diagnostics.Debug.WriteLine("Game Won!");
+                StopTimer(); // Stop timer on win
+                // TODO: Display win message, update statistics
+                MessageBox.Show($"Congratulations {CurrentUser.UserName}, you won!\nTime remaining: {TimeRemaining:mm\\:ss}", "You Won!", MessageBoxButton.OK, MessageBoxImage.Information);
+                // UpdateStats(won: true);
+            }
+        }
 
         #endregion
 

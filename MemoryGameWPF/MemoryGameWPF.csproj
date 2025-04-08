@@ -9,6 +9,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="GameImages\Animals\bear.png" />
+    <None Remove="GameImages\Animals\cat.jpg" />
+    <None Remove="GameImages\Animals\dog.jpg" />
+    <None Remove="GameImages\Animals\elephant.png" />
+    <None Remove="GameImages\Animals\fox.jpg" />
+    <None Remove="GameImages\Animals\giraffe.jpg" />
+    <None Remove="GameImages\Animals\hippo.png" />
+    <None Remove="GameImages\Animals\kangaroo.jpg" />
+    <None Remove="GameImages\Animals\koala.png" />
+    <None Remove="GameImages\Animals\lion.jpg" />
+    <None Remove="GameImages\Animals\monkey.png" />
+    <None Remove="GameImages\Animals\owl.jpg" />
+    <None Remove="GameImages\Animals\panda.jpg" />
+    <None Remove="GameImages\Animals\penguin.png" />
+    <None Remove="GameImages\Animals\rabbit.jpg" />
+    <None Remove="GameImages\Animals\tiger.jpg" />
+    <None Remove="GameImages\Animals\wolf.jpg" />
+    <None Remove="GameImages\Animals\zebra.jpg" />
     <None Remove="Images\cat.jpg" />
     <None Remove="Images\dog.jpg" />
     <None Remove="Images\lion.jpg" />
@@ -21,6 +39,60 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="GameImages\Animals\bear.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\cat.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\dog.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\elephant.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\fox.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\giraffe.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\hippo.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\kangaroo.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\koala.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\lion.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\monkey.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\owl.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\panda.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\penguin.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\rabbit.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\tiger.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\wolf.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Animals\zebra.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\cat.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -36,6 +108,11 @@
     <Resource Include="Images\tiger.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GameImages\Nature\" />
+    <Folder Include="GameImages\Objects\" />
   </ItemGroup>
 
 </Project>

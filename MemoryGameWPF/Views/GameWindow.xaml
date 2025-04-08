@@ -89,7 +89,7 @@
                         </Button.Style>
 
                         <!-- Content of the Button -->
-                        <Grid>
+                        <Grid Background="Transparent">
                             <!-- Card Back (Visible when not flipped) -->
                             <!-- Use a Style with Trigger for visibility based on IsFlipped -->
                             <Border Background="CornflowerBlue" CornerRadius="5">
@@ -109,7 +109,7 @@
 
                             <!-- Card Image (Visible when flipped and not matched) -->
                             <!-- Use a Style with Trigger for visibility based on IsFlipped -->
-                            <Image Source="{Binding ImagePath}" Stretch="Uniform">
+                            <Image Source="{Binding ImagePath}" Stretch="Uniform" x:Name="CardImage">
                                 <Image.Style>
                                     <Style TargetType="Image">
                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -144,12 +144,15 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <!-- TODO: Add Timer/Status Display (Grid.Row="2") -->
         <StatusBar Grid.Row="2">
             <StatusBarItem>
                 <TextBlock Text="{Binding BoardSizeDescription, StringFormat='Size: {0}'}" Margin="5,0"/>
             </StatusBarItem>
-            <!-- Add Timer TextBlock here -->
+            <Separator/>
+            <!-- Timer Display -->
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="{Binding TimeRemainingFormatted}" Margin="5,0" FontWeight="Bold"/>
+            </StatusBarItem>
         </StatusBar>
 
     </Grid>
