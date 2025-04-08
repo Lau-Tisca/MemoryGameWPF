@@ -10,7 +10,6 @@ using System.Windows;
 using System.Windows.Input;
 using MemoryGameWPF.Models;
 using MemoryGameWPF.Views;
-using MemoryGameWPF.ViewModels; 
 
 namespace MemoryGameWPF.ViewModels
 {
@@ -207,24 +206,24 @@ namespace MemoryGameWPF.ViewModels
 
         private void ExecutePlay(object parameter)
         {
-            if (SelectedUser == null) return;
+            //if (SelectedUser == null) return;
 
-            // 1. Create the GameViewModel, passing the selected user
-            GameViewModel gameViewModel = new GameViewModel(SelectedUser); // Assuming constructor takes User
+            //// 1. Create the GameViewModel, passing the selected user
+            //GameViewModel gameViewModel = new GameViewModel(SelectedUser); // Assuming constructor takes User
 
-            // 2. Create the GameWindow
-            GameWindow gameWindow = new GameWindow();
+            //// 2. Create the GameWindow
+            //GameWindow gameWindow = new GameWindow();
 
-            // 3. Set the DataContext
-            gameWindow.DataContext = gameViewModel;
+            //// 3. Set the DataContext
+            //gameWindow.DataContext = gameViewModel;
 
-            // 4. Show the GameWindow
-            gameWindow.Show();
+            //// 4. Show the GameWindow
+            //gameWindow.Show();
 
-            // 5. Close the current SignIn/MainWindow
-            // This assumes the current Application.Current.MainWindow *is* the sign-in window.
-            // Be cautious if your application structure is different.
-            Application.Current.MainWindow?.Close();
+            //// 5. Close the current SignIn/MainWindow
+            //// This assumes the current Application.Current.MainWindow *is* the sign-in window.
+            //// Be cautious if your application structure is different.
+            //Application.Current.MainWindow?.Close();
         }
 
         private bool CanExecutePlay(object parameter)

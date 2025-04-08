@@ -39,6 +39,7 @@ namespace MemoryGameWPF.ViewModels
                 _selectedImagePath = value;
                 OnPropertyChanged();
                 LoadImagePreview(); // Load and set ImageSource when path changes
+                SaveUserCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -210,21 +211,22 @@ namespace MemoryGameWPF.ViewModels
                 {
                     BitmapImage bitmap = new BitmapImage();
                     bitmap.BeginInit();
-                    bitmap.UriSource = new Uri(SelectedImagePath);
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad; // Cache for better performance
+                    // Use Absolute URI for files outside the project during selection
+                    bitmap.UriSource = new Uri(SelectedImagePath, UriKind.Absolute);
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad; // Load immediately
+                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache; // Try ignoring cache
                     bitmap.EndInit();
-                    SelectedImageSource = bitmap;
+                    SelectedImageSource = bitmap; // Assign to the bound property
                 }
-                catch (IOException ex)
+                catch (Exception ex) // Catch more general exceptions during debugging
                 {
-                    // Handle image loading errors (e.g., invalid file path, corrupted image)
-                    System.Windows.MessageBox.Show($"Error loading image: {ex.Message}", "Image Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-                    SelectedImageSource = null; // Clear preview on error
+                    System.Windows.MessageBox.Show($"Error loading image preview:\n{SelectedImagePath}\n{ex.Message}", "Image Preview Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    SelectedImageSource = null;
                 }
             }
             else
             {
-                SelectedImageSource = null; // Clear preview if no image path
+                SelectedImageSource = null;
             }
         }
 

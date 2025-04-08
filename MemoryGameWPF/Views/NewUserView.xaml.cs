@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MemoryGameWPF.ViewModels;
 
 namespace MemoryGameWPF.Views
 {
@@ -22,6 +23,7 @@ namespace MemoryGameWPF.Views
         public NewUserView()
         {
             InitializeComponent();
+            DataContext = new NewUserViewModel();
         }
     }
 }

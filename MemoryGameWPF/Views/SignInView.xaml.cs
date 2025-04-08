@@ -24,7 +24,7 @@ namespace MemoryGameWPF.Views
         public SignInView()
         {
             InitializeComponent();
-            DataContext = new SignInViewModel();
+            this.DataContext = new SignInViewModel();
         }
     }
 }
