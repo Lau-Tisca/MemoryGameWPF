@@ -4,9 +4,153 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MemoryGameWPF.Views"
+        xmlns:viewModels="clr-namespace:MemoryGameWPF.ViewModels"
+        xmlns:converters="clr-namespace:MemoryGameWPF.Converters"
         mc:Ignorable="d"
-        Title="GameWindow" Height="450" Width="800">
+        Title="Memory Game" Height="600" Width="800"
+        d:DataContext="{d:DesignInstance Type=viewModels:GameViewModel, IsDesignTimeCreatable=False}">
+    <!-- Design time DataContext -->
+
+    <Window.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </Window.Resources>
+
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- For Menu -->
+            <RowDefinition Height="*"/>
+            <!-- For Game Board -->
+            <RowDefinition Height="Auto"/>
+            <!-- For Timer/Status -->
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <!-- Add other File menu items later (Category, Open, Save, Stats, Exit) -->
+                <MenuItem Header="_New Game" Command="{Binding NewGameCommand}"/>
+                <Separator />
+                <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+                <!-- Example Exit command -->
+            </MenuItem>
+            <MenuItem Header="_Options">
+                <!-- Add Options menu items later (Standard, Custom) -->
+                <MenuItem Header="_Standard (4x4)" Command="{Binding SetStandardOptionsCommand}"/>
+                <MenuItem Header="_Custom..." Command="{Binding SetCustomOptionsCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <!-- Add Help menu items later (About) -->
+                <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Game Board Area -->
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding GameBoardCards}" Margin="10">
+            <!-- Panel to arrange items in a grid -->
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <!-- UniformGrid automatically adjusts cell size -->
+                    <!-- Bind Columns to the ViewModel property -->
+                    <UniformGrid Rows="{Binding Rows}" Columns="{Binding Columns}" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <!-- How each card (CardViewModel) should look -->
+            <!-- How each card (CardViewModel) should look -->
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type viewModels:CardViewModel}">
+                    <!-- Specify DataType for better tooling -->
+                    <Button Command="{Binding FlipCardCommand}"
+                Height="80" Width="80" Margin="5" Padding="0"
+                x:Name="CardButton">
+                        <!-- Give the button a name if needed for Style Setters -->
+
+                        <!-- Define a Style specifically for this button within the DataTemplate -->
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <!-- Set default IsEnabled based on IsMatched initially -->
+                                <!-- Note: Command's CanExecute will also influence IsEnabled -->
+                                <Setter Property="IsEnabled" Value="{Binding IsMatched, Converter={StaticResource InverseBooleanConverter}}"/>
+                                <!-- Optional: Set default Opacity -->
+                                <Setter Property="Opacity" Value="1.0"/>
+
+                                <Style.Triggers>
+                                    <!-- Trigger to disable and fade when matched -->
+                                    <DataTrigger Binding="{Binding IsMatched}" Value="True">
+                                        <!-- Option 1: Make matched cards semi-transparent -->
+                                        <Setter Property="Opacity" Value="0.3"/>
+                                        <!-- Disable button when matched (redundant if CanExecute handles it, but safe) -->
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                        <!-- Option 2: Collapse (handled differently, usually via Visibility on container) -->
+                                        <!-- Option 3: Show overlay (would need overlay element and trigger its visibility) -->
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+
+                        <!-- Content of the Button -->
+                        <Grid>
+                            <!-- Card Back (Visible when not flipped) -->
+                            <!-- Use a Style with Trigger for visibility based on IsFlipped -->
+                            <Border Background="CornflowerBlue" CornerRadius="5">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <!-- Default: Show Back -->
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsFlipped}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <!-- Hide Back when Flipped -->
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+
+                            <!-- Card Image (Visible when flipped and not matched) -->
+                            <!-- Use a Style with Trigger for visibility based on IsFlipped -->
+                            <Image Source="{Binding ImagePath}" Stretch="Uniform">
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <!-- Default: Hide Image -->
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsFlipped}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <!-- Show Image when Flipped -->
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+
+                            <!-- Optional: Visual indication for matched cards (Overlay example) -->
+                            <!--
+                <Border Background="#AAFFFFFF" CornerRadius="5" Visibility="Collapsed">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMatched}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                 </Border>
+                 -->
+                        </Grid>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- TODO: Add Timer/Status Display (Grid.Row="2") -->
+        <StatusBar Grid.Row="2">
+            <StatusBarItem>
+                <TextBlock Text="{Binding BoardSizeDescription, StringFormat='Size: {0}'}" Margin="5,0"/>
+            </StatusBarItem>
+            <!-- Add Timer TextBlock here -->
+        </StatusBar>
+
     </Grid>
 </Window>

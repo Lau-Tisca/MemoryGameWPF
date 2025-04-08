@@ -40,20 +40,14 @@
         <!-- DataBinding for User Image -->
 
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-            <Button Name="NewUserButton" Content="New User" Margin="5" Command="{Binding NewUserCommand}"/>
+            <Button Name="NewUserButton" Content="New User" Margin="10" Command="{Binding NewUserCommand}"/>
             <!-- DataBinding for New User Command -->
-            <Button Name="DeleteUserButton" Content="Delete User" Margin="5" IsEnabled="False" Command="{Binding DeleteUserCommand}"/>
+            <Button Name="DeleteUserButton" Content="Delete User" Margin="10" Command="{Binding DeleteUserCommand}"/>
             <!-- DataBinding for Delete User Command -->
-            <Button Name="PlayButton" Content="Play" Margin="5" IsEnabled="False" Command="{Binding PlayCommand}"/>
+            <Button Name="PlayButton" Content="Play" Margin="10" Command="{Binding PlayCommand}"/>
             <!-- DataBinding for Play Command -->
-            <Button Name="CancelButton" Content="Cancel" Margin="5" Command="{Binding CancelCommand}"/>
+            <Button Name="CancelButton" Content="Cancel" Margin="10" Command="{Binding CancelCommand}"/>
             <!-- DataBinding for Cancel Command -->
-        </StackPanel>
-
-        <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal">
-            <Button Content="&lt;&lt;" Margin="5"/>
-            <Button Content=">>" Margin="5"/>
-            <!-- Optional buttons, functionality not strictly defined -->
         </StackPanel>
 
     </Grid>

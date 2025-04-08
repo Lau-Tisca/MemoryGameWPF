@@ -265,8 +265,8 @@ namespace MemoryGameWPF.ViewModels
             }
 
 
-            // 8. Final Confirmation (Optional)
-            // MessageBox.Show($"User '{userNameToDelete}' and associated data deleted successfully.", "Deletion Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                // 8. Final Confirmation (Optional)
+                MessageBox.Show($"User '{userNameToDelete}' and associated data deleted successfully.", "Deletion Complete", MessageBoxButton.OK, MessageBoxImage.Information);
 
         }
         catch (Exception ex) // Catch unexpected errors during the core deletion process
@@ -285,24 +285,55 @@ namespace MemoryGameWPF.ViewModels
 
         private void ExecutePlay(object parameter)
         {
-            if (SelectedUser == null) return;
+            // 1. Safety Check
+            if (SelectedUser == null)
+            {
+                MessageBox.Show("Please select a user to play.", "No User Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
-            // 1. Create the GameViewModel, passing the selected user
-            GameViewModel gameViewModel = new GameViewModel(SelectedUser); // Assuming constructor takes User
+            try
+            {
+                // 2. Create the GameViewModel, passing the selected user
+                GameViewModel gameViewModel = new GameViewModel(SelectedUser);
 
-            // 2. Create the GameWindow
-            GameWindow gameWindow = new GameWindow();
+                // 3. Create the GameWindow
+                GameWindow gameWindow = new GameWindow();
 
-            // 3. Set the DataContext
-            gameWindow.DataContext = gameViewModel;
+                // 4. Set the DataContext for the GameWindow
+                gameWindow.DataContext = gameViewModel;
 
-            // 4. Show the GameWindow
-            gameWindow.Show();
+                // 5. Get a reference to the current MainWindow (which hosts SignInView)
+                Window currentMainWindow = Application.Current.MainWindow;
 
-            // 5. Close the current SignIn/MainWindow
-            // This assumes the current Application.Current.MainWindow *is* the sign-in window.
-            // Be cautious if your application structure is different.
-            Application.Current.MainWindow?.Close();
+                // 6. Show the new GameWindow
+                //    Show() makes it non-modal, allowing interaction with other windows if any were open.
+                //    If you wanted it modal (though unlikely for the main game window), use ShowDialog().
+                gameWindow.Show();
+
+                // 7. Close the current MainWindow (hosting SignInView)
+                //    Check if it exists before trying to close.
+                if (currentMainWindow != null)
+                {
+                    // Important: Setting the new GameWindow as the MainWindow *before* closing
+                    // the old one can sometimes help with application lifetime management,
+                    // especially if the original MainWindow closing triggers App shutdown.
+                    Application.Current.MainWindow = gameWindow; // Set the new window as the main one
+                    currentMainWindow.Close(); // Close the old sign-in window
+                }
+                else
+                {
+                    // Fallback if the original MainWindow reference was lost somehow
+                    System.Diagnostics.Debug.WriteLine("Warning: Could not find original MainWindow to close in ExecutePlay.");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error starting game: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Log the full exception details for debugging
+                System.Diagnostics.Debug.WriteLine($"ERROR starting game: {ex.ToString()}");
+            }
         }
 
         private bool CanExecutePlay(object parameter)
