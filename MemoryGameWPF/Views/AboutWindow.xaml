@@ -1,0 +1,50 @@
+﻿<Window x:Class="MemoryGameWPF.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MemoryGameWPF.Views"
+        mc:Ignorable="d"
+        Title="About Memory Game" Height="250" Width="400"
+        WindowStartupLocation="CenterOwner" 
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <!-- Optional: Don't show separate taskbar icon -->
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold" Text="Memory Game Application" Margin="0,0,0,10"/>
+
+        <TextBlock Grid.Row="1" Margin="0,5">
+            <Run Text="Student:"/>
+            <Run Text="Tisca Laurentiu-Stefan" FontWeight="SemiBold"/>
+        </TextBlock>
+
+        <TextBlock Grid.Row="2" Margin="0,5">
+            <Run Text="Group:"/>
+            <Run Text="10LF333" FontWeight="SemiBold"/>
+        </TextBlock>
+
+        <TextBlock Grid.Row="3" Margin="0,5">
+             <Run Text="Specialization:"/>
+             <Run Text="Informatica Aplicata" FontWeight="SemiBold"/>
+        </TextBlock>
+
+        <TextBlock Grid.Row="4" Margin="0,5">
+            <Run Text="Institutional Email:"/>
+            <Hyperlink NavigateUri="mailto:laurentiu.tisca@student.unitbv.ro" RequestNavigate="Hyperlink_RequestNavigate">
+                <Run Text="laurentiu.tisca@student.unitbv.ro" />
+            </Hyperlink>
+        </TextBlock>
+
+        <Button Grid.Row="5" Content="OK" Width="75" HorizontalAlignment="Right" IsDefault="True" Click="OkButton_Click"/>
+
+    </Grid>
+</Window>

@@ -27,6 +27,43 @@
     <None Remove="GameImages\Animals\tiger.jpg" />
     <None Remove="GameImages\Animals\wolf.jpg" />
     <None Remove="GameImages\Animals\zebra.jpg" />
+    <None Remove="GameImages\Nature\aurora.jpg" />
+    <None Remove="GameImages\Nature\beach.jpg" />
+    <None Remove="GameImages\Nature\canyon.jpg" />
+    <None Remove="GameImages\Nature\desert.png" />
+    <None Remove="GameImages\Nature\forest.jpg" />
+    <None Remove="GameImages\Nature\glacier.jpeg" />
+    <None Remove="GameImages\Nature\island.png" />
+    <None Remove="GameImages\Nature\lake.jpg" />
+    <None Remove="GameImages\Nature\meadow.png" />
+    <None Remove="GameImages\Nature\mountain.png" />
+    <None Remove="GameImages\Nature\ocean.jpg" />
+    <None Remove="GameImages\Nature\river.png" />
+    <None Remove="GameImages\Nature\sunrise.jpg" />
+    <None Remove="GameImages\Nature\sunset.png" />
+    <None Remove="GameImages\Nature\tree.jpg" />
+    <None Remove="GameImages\Nature\valley.jpg" />
+    <None Remove="GameImages\Nature\volcano.jpg" />
+    <None Remove="GameImages\Nature\waterfall.png" />
+    <None Remove="GameImages\Objects\book.png" />
+    <None Remove="GameImages\Objects\car.jpg" />
+    <None Remove="GameImages\Objects\chair.jpg" />
+    <None Remove="GameImages\Objects\clock.JPG" />
+    <None Remove="GameImages\Objects\computer.png" />
+    <None Remove="GameImages\Objects\cup.jpg" />
+    <None Remove="GameImages\Objects\guitar.png" />
+    <None Remove="GameImages\Objects\house.jpg" />
+    <None Remove="GameImages\Objects\key.png" />
+    <None Remove="GameImages\Objects\lamp.jpg" />
+    <None Remove="GameImages\Objects\phone.png" />
+    <None Remove="GameImages\Objects\plain.jpg" />
+    <None Remove="GameImages\Objects\plane.jpg" />
+    <None Remove="GameImages\Objects\ship.png" />
+    <None Remove="GameImages\Objects\table.jpg" />
+    <None Remove="GameImages\Objects\train.jpg" />
+    <None Remove="GameImages\Objects\umbrella.jpg" />
+    <None Remove="GameImages\Objects\vase.jpg" />
+    <None Remove="GameImages\Objects\watch.jpg" />
     <None Remove="Images\cat.jpg" />
     <None Remove="Images\dog.jpg" />
     <None Remove="Images\lion.jpg" />
@@ -93,6 +130,114 @@
     <Resource Include="GameImages\Animals\zebra.jpg">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="GameImages\Nature\aurora.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\beach.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\canyon.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\desert.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\forest.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\glacier.jpeg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\island.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\lake.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\meadow.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\mountain.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\ocean.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\river.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\sunrise.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\sunset.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\tree.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\valley.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\volcano.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Nature\waterfall.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\book.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\car.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\chair.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\clock.JPG">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\computer.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\cup.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\guitar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\house.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\key.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\lamp.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\phone.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\plane.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\ship.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\table.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\train.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\umbrella.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\vase.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="GameImages\Objects\watch.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\cat.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -108,11 +253,6 @@
     <Resource Include="Images\tiger.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="GameImages\Nature\" />
-    <Folder Include="GameImages\Objects\" />
   </ItemGroup>
 
 </Project>

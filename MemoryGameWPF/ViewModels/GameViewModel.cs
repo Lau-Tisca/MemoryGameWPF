@@ -1,4 +1,5 @@
 ﻿using MemoryGameWPF.Models;
+using MemoryGameWPF.Views;
 using System;
 using System.Collections.Generic; // For List
 using System.Collections.ObjectModel; // For ObservableCollection
@@ -111,12 +112,14 @@ namespace MemoryGameWPF.ViewModels
         #endregion
 
         #region Commands
-        // We will add commands for menu items later (New Game, Options, etc.)
-        // public ICommand NewGameCommand { get; }
-        // public ICommand SetStandardOptionsCommand { get; }
-        // public ICommand SetCustomOptionsCommand { get; }
 
         public RelayCommand<object> NewGameCommand { get; }
+        public RelayCommand<string> SelectCategoryCommand { get; } // Takes category name string
+        public RelayCommand<object> SetStandardOptionsCommand { get; }
+        public RelayCommand<object> SetCustomOptionsCommand { get; } // Placeholder
+        public RelayCommand<object> ExitCommand { get; }
+        public RelayCommand<object> AboutCommand { get; }
+
         #endregion
 
         #region Constructor
@@ -137,9 +140,12 @@ namespace MemoryGameWPF.ViewModels
             GameBoardCards = new ObservableCollection<CardViewModel>();
             // Initialize Commands
             NewGameCommand = new RelayCommand<object>(ExecuteNewGame);
+            SelectCategoryCommand = new RelayCommand<string>(ExecuteSelectCategory);
+            SetStandardOptionsCommand = new RelayCommand<object>(ExecuteSetStandardOptions);
+            SetCustomOptionsCommand = new RelayCommand<object>(ExecuteSetCustomOptions, CanExecuteSetCustomOptions); // Add CanExecute later if needed
+            ExitCommand = new RelayCommand<object>(ExecuteExit);
+            AboutCommand = new RelayCommand<object>(ExecuteAbout);
             // TODO: Initialize other commands (Options, Save, Load etc.)
-            // Example (implement methods later):
-            // SetStandardOptionsCommand = new RelayCommand<object>(ExecuteSetStandardOptions);
             _currentlyFlippedCards = new List<CardViewModel>(2);
 
             InitializeTimer();
@@ -176,10 +182,10 @@ namespace MemoryGameWPF.ViewModels
                         imageNames.AddRange(new[] { "cat.jpg", "dog.jpg", "lion.jpg", "panda.jpg", "tiger.jpg", "elephant.png", "giraffe.jpg", "monkey.png", "zebra.jpg", "bear.png", "fox.jpg", "hippo.png", "kangaroo.jpg", "koala.png", "owl.jpg", "penguin.png", "rabbit.jpg", "wolf.jpg" }); // Need at least 18 for 6x6
                         break;
                     case "Nature":
-                        imageNames.AddRange(new[] { "beach.jpg", "desert.png", "forest.jpg", "island.png", "lake.jpg", "mountain.png", "ocean.jpg", "river.png", "sunrise.jpg", "sunset.png", "tree.jpg", "valley.png", "volcano.jpg", "waterfall.png", "aurora.jpg", "canyon.png", "glacier.jpg", "meadow.png" }); // Need 18
+                        imageNames.AddRange(new[] { "beach.jpg", "desert.png", "forest.jpg", "island.png", "lake.jpg", "mountain.png", "ocean.jpg", "river.png", "sunrise.jpg", "sunset.png", "tree.jpg", "valley.jpg", "volcano.jpg", "waterfall.png", "aurora.jpg", "canyon.jpg", "glacier.jpeg", "meadow.png" }); // Need 18
                         break;
                     case "Objects":
-                        imageNames.AddRange(new[] { "book.png", "car.jpg", "chair.png", "clock.jpg", "computer.png", "cup.jpg", "guitar.png", "house.jpg", "key.png", "lamp.jpg", "phone.png", "plane.jpg", "ship.png", "table.jpg", "train.png", "umbrella.jpg", "vase.png", "watch.jpg" }); // Need 18
+                        imageNames.AddRange(new[] { "book.png", "car.jpg", "chair.jpg", "clock.jpg", "computer.png", "cup.jpg", "guitar.png", "house.jpg", "key.png", "lamp.jpg", "phone.png", "plane.jpg", "ship.png", "table.jpg", "train.jpg", "umbrella.jpg", "vase.jpg", "watch.jpg" }); // Need 18
                         break;
                 }
 
@@ -281,6 +287,117 @@ namespace MemoryGameWPF.ViewModels
                 // TODO: Update statistics (played game, but didn't win)
                 // UpdateStats(won: false);
             }
+        }
+
+        // Add these methods to the Methods region in GameViewModel.cs
+
+        private void ExecuteSelectCategory(string categoryName)
+        {
+            if (!string.IsNullOrEmpty(categoryName) && AvailableCategories.Contains(categoryName))
+            {
+                SelectedCategory = categoryName; // This setter already calls LoadImagePathsForCategory
+                System.Diagnostics.Debug.WriteLine($"Category selected: {SelectedCategory}");
+                // Optional: Automatically start a new game when category changes?
+                // InitializeNewGame();
+                MessageBox.Show($"Category set to '{SelectedCategory}'. Start a New Game to apply.", "Category Changed", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void ExecuteSetStandardOptions(object parameter)
+        {
+            // Since Rows/Columns are currently read-only returning 4, this doesn't
+            // functionally change anything *yet*. But if we re-introduce settable
+            // Rows/Columns later, this command would set them back to 4x4.
+            // For now, it can just confirm the setting.
+            // Rows = 4; // Would need settable properties
+            // Columns = 4; // Would need settable properties
+            System.Diagnostics.Debug.WriteLine("Options set to Standard (4x4).");
+            MessageBox.Show("Options set to Standard (4x4). Start a New Game to apply.", "Options Changed", MessageBoxButton.OK, MessageBoxImage.Information);
+            // Optional: Automatically start a new game?
+            // InitializeNewGame();
+        }
+
+        private void ExecuteSetCustomOptions(object parameter)
+        {
+            // TODO: Implement Custom Options Dialog
+            // 1. Create a new Window (e.g., CustomOptionsWindow.xaml) and ViewModel (CustomOptionsViewModel.cs)
+            // 2. CustomOptionsViewModel should have properties for Rows & Columns (e.g., with validation 2-6, even total)
+            // 3. Open the CustomOptionsWindow as a dialog.
+            // 4. If the dialog returns OK (user clicked Save/OK):
+            //    - Get the selected Rows/Columns from CustomOptionsViewModel.
+            //    - Update the Rows/Columns properties in *this* GameViewModel.
+            //    - (Requires making Rows/Columns properties settable again)
+            // 5. Optional: Automatically start a new game with custom dimensions?
+
+            MessageBox.Show("Custom Options dialog not yet implemented.", "TODO", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        private bool CanExecuteSetCustomOptions(object parameter)
+        {
+            // TODO: Return false if custom options feature is disabled
+            return true; // Enable for now, even if not implemented
+        }
+
+
+        private void ExecuteExit(object parameter)
+        {
+            // Goal: Close the GameWindow and show the SignInView/MainWindow again.
+
+            // 1. Stop any ongoing game processes (like the timer)
+            StopTimer();
+            _isGameActive = false; // Ensure game state is inactive
+
+            // 2. Find the GameWindow associated with this ViewModel instance
+            Window currentGameWindow = null;
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.DataContext == this && window is GameWindow)
+                {
+                    currentGameWindow = window;
+                    break;
+                }
+            }
+
+            if (currentGameWindow == null)
+            {
+                System.Diagnostics.Debug.WriteLine("Warning: Could not find GameWindow instance to close in ExecuteExit.");
+                // Might need a more robust way to get the window reference if this fails
+                return;
+            }
+
+            try
+            {
+                // 3. Create and show the SignIn view (MainWindow)
+                //    We assume MainWindow hosts SignInView initially.
+                MainWindow signInWindow = new MainWindow(); // Creates the window hosting SignInView
+                Application.Current.MainWindow = signInWindow; // Set it as the main window *before* showing
+                signInWindow.Show();
+
+                // 4. Close the current GameWindow
+                currentGameWindow.Close();
+                System.Diagnostics.Debug.WriteLine("Exited game, returned to Sign In.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error trying to return to Sign In screen: {ex.Message}", "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ExecuteAbout(object parameter)
+        {
+            AboutWindow aboutWindow = new AboutWindow();
+
+            // Try to set the owner window for better modality behavior
+            Window owner = Application.Current.Windows.OfType<GameWindow>().FirstOrDefault(w => w.DataContext == this);
+            if (owner != null)
+            {
+                aboutWindow.Owner = owner;
+            }
+            else // Fallback if GameWindow not found easily (might happen during quick transitions)
+            {
+                aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+
+            aboutWindow.ShowDialog(); // Show as a modal dialog
         }
 
         // Core logic to set up a new game board

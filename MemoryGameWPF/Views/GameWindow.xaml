@@ -27,20 +27,38 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <!-- Add other File menu items later (Category, Open, Save, Stats, Exit) -->
                 <MenuItem Header="_New Game" Command="{Binding NewGameCommand}"/>
-                <Separator />
-                <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
-                <!-- Example Exit command -->
-            </MenuItem>
+                <MenuItem Header="_Category">
+                    <!-- Option 1: Static Items (Simpler for fixed categories) -->
+                    <MenuItem Header="_Animals" Command="{Binding SelectCategoryCommand}" CommandParameter="Animals"/>
+                    <MenuItem Header="_Nature" Command="{Binding SelectCategoryCommand}" CommandParameter="Nature"/>
+                    <MenuItem Header="_Objects" Command="{Binding SelectCategoryCommand}" CommandParameter="Objects"/>
+                    <!-- Option 2: Dynamic Items (More complex, uses ItemsSource) -->
+                    <!-- <MenuItem Header="_Category" ItemsSource="{Binding AvailableCategories}">
+                 <MenuItem.ItemContainerStyle>
+                     <Style TargetType="MenuItem">
+                         <Setter Property="Header" Value="{Binding}"/>
+                         <Setter Property="Command" Value="{Binding DataContext.SelectCategoryCommand, RelativeSource={RelativeSource AncestorType=Menu}}"/>
+                         <Setter Property="CommandParameter" Value="{Binding}"/>
+                     </Style>
+                 </MenuItem.ItemContainerStyle>
+                 </MenuItem> -->
+                    <!-- Add placeholders for Open/Save/Stats later -->
+                    <MenuItem Header="_Open Game" IsEnabled="False"/>
+                    <MenuItem Header="_Save Game" IsEnabled="False"/>
+                    <MenuItem Header="_Statistics" IsEnabled="False"/>
+                </MenuItem>
             <MenuItem Header="_Options">
                 <!-- Add Options menu items later (Standard, Custom) -->
                 <MenuItem Header="_Standard (4x4)" Command="{Binding SetStandardOptionsCommand}"/>
                 <MenuItem Header="_Custom..." Command="{Binding SetCustomOptionsCommand}"/>
-            </MenuItem>
-            <MenuItem Header="_Help">
-                <!-- Add Help menu items later (About) -->
-                <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
+                <Separator />
+                <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+                </MenuItem>
+                <MenuItem Header="_Help">
+                    <!-- Add Help menu items later (About) -->
+                    <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
+                </MenuItem>
             </MenuItem>
         </Menu>
 
@@ -123,21 +141,6 @@
                                     </Style>
                                 </Image.Style>
                             </Image>
-
-                            <!-- Optional: Visual indication for matched cards (Overlay example) -->
-                            <!--
-                <Border Background="#AAFFFFFF" CornerRadius="5" Visibility="Collapsed">
-                    <Border.Style>
-                        <Style TargetType="Border">
-                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsMatched}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                 </Border>
-                 -->
                         </Grid>
                     </Button>
                 </DataTemplate>
