@@ -64,7 +64,6 @@
             </ItemsControl.ItemsPanel>
 
             <!-- How each card (CardViewModel) should look -->
-            <!-- How each card (CardViewModel) should look -->
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type viewModels:CardViewModel}">
                     <!-- Specify DataType for better tooling -->

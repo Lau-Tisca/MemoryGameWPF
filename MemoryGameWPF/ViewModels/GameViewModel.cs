@@ -377,8 +377,6 @@ namespace MemoryGameWPF.ViewModels
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Memory Game Save (*.mgs)|*.mgs|All Files (*.*)|*.*";
-            // Suggest initial directory
-            // openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
 
@@ -473,6 +471,7 @@ namespace MemoryGameWPF.ViewModels
                 MessageBox.Show($"Sorry {CurrentUser.UserName}, you ran out of time!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Stop);
 
                 _updateStatsAction(CurrentUser.UserName, false);
+                DeleteCurrentSaveFile();
             }
         }
 
@@ -612,6 +611,8 @@ namespace MemoryGameWPF.ViewModels
             System.Diagnostics.Debug.WriteLine($"Starting new game: {Rows}x{Columns}, Category: {SelectedCategory}");
 
             GameBoardCards.Clear(); // Clear previous cards
+
+            _currentSaveFilePath = null;
 
             int totalCards = Rows * Columns;
             if (totalCards % 2 != 0)
@@ -780,6 +781,51 @@ namespace MemoryGameWPF.ViewModels
                 StopTimer(); 
                 MessageBox.Show($"Congratulations {CurrentUser.UserName}, you won!\nTime remaining: {TimeRemaining:mm\\:ss}", "You Won!", MessageBoxButton.OK, MessageBoxImage.Information);
                 _updateStatsAction(CurrentUser.UserName, true);
+                DeleteCurrentSaveFile();
+            }
+        }
+
+        private void DeleteCurrentSaveFile()
+        {
+            // Check if we actually loaded from a specific file path
+            if (!string.IsNullOrEmpty(_currentSaveFilePath))
+            {
+                string pathToDelete = _currentSaveFilePath; // Copy to local variable
+                _currentSaveFilePath = null; // Clear the tracked path immediately
+
+                System.Diagnostics.Debug.WriteLine($"Attempting to delete completed save file: {pathToDelete}");
+                try
+                {
+                    if (File.Exists(pathToDelete))
+                    {
+                        File.Delete(pathToDelete);
+                        MessageBox.Show("The loaded save file for the completed game has been deleted.", "Save File Deleted", MessageBoxButton.OK, MessageBoxImage.Information);
+                        System.Diagnostics.Debug.WriteLine($"Successfully deleted save file: {pathToDelete}");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Save file not found for deletion (already deleted?): {pathToDelete}");
+                    }
+                }
+                catch (IOException ioEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"IO Error deleting save file {pathToDelete}: {ioEx.Message}");
+                    MessageBox.Show($"Could not delete the save file:\n{pathToDelete}\n\nReason: {ioEx.Message}\n\nYou may need to delete it manually.", "Save Deletion Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (UnauthorizedAccessException authEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Permission Error deleting save file {pathToDelete}: {authEx.Message}");
+                    MessageBox.Show($"Permission denied when trying to delete the save file:\n{pathToDelete}\n\nYou may need to delete it manually.", "Save Deletion Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Unexpected Error deleting save file {pathToDelete}: {ex.Message}");
+                    MessageBox.Show($"An unexpected error occurred while deleting the save file:\n{pathToDelete}\n\nYou may need to delete it manually.", "Save Deletion Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("No loaded save file path to delete.");
             }
         }
 
