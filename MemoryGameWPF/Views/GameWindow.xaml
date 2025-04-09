@@ -38,8 +38,8 @@
                 <MenuItem Header="_Standard (4x4)" Command="{Binding SetStandardOptionsCommand}"/>
                 <MenuItem Header="_Custom..." Command="{Binding SetCustomOptionsCommand}"/>
                 <!-- Add placeholders for Open/Save/Stats later -->
-                <MenuItem Header="_Open Game" IsEnabled="False"/>
-                <MenuItem Header="_Save Game" IsEnabled="False"/>
+                    <MenuItem Header="_Open Game" Command="{Binding OpenGameCommand}"/>
+                <MenuItem Header="_Save Game" Command="{Binding SaveGameCommand}"/>
                 <MenuItem Header="_Statistics" Command="{Binding ShowStatisticsCommand}"/>
                 <Separator />
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>

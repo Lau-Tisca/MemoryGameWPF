@@ -13,6 +13,8 @@ using GalaSoft.MvvmLight.Command;
 using System.Windows; // For RelayCommand (optional, for command binding)
 using System.Threading.Tasks; // For Task.Delay
 using System.Windows.Threading; // For DispatcherTimer
+using Microsoft.Win32; // For SaveFileDialog, OpenFileDialog
+using System.Text.Json;
 
 namespace MemoryGameWPF.ViewModels
 {
@@ -24,6 +26,7 @@ namespace MemoryGameWPF.ViewModels
         private List<CardViewModel> _currentlyFlippedCards = new List<CardViewModel>(); // Track flipped cards
         private bool _isCheckingPair = false; // Flag to prevent clicking during pair check delay
         private readonly Action<string, bool> _updateStatsAction;
+        private string _currentSaveFilePath = null; // Track the path if a game was loaded/saved
 
         // Timer Fields
         private DispatcherTimer _gameTimer;
@@ -118,37 +121,13 @@ namespace MemoryGameWPF.ViewModels
         public RelayCommand<object> ExitCommand { get; }
         public RelayCommand<object> AboutCommand { get; }
         public RelayCommand<object> ShowStatisticsCommand { get; }
+        public RelayCommand<object> SaveGameCommand { get; }
+        public RelayCommand<object> OpenGameCommand { get; } // Need this in File Menu
+
 
         #endregion
 
         #region Constructor
-        //public GameViewModel(User currentUser)
-        //{
-        //    CurrentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
-        //    WelcomeMessage = $"Welcome, {CurrentUser.UserName}! Select options and start a new game!";
-
-        //    // Initialize Categories
-        //    AvailableCategories = new List<string> { "Animals", "Nature", "Objects" }; // Match your folder names
-        //    SelectedCategory = AvailableCategories.FirstOrDefault(); // Select the first category by default
-
-        //    // Load initial image paths
-        //    _availableImagePaths = new List<string>();
-        //    LoadImagePathsForCategory();
-
-        //    // Inside GameViewModel constructor
-        //    GameBoardCards = new ObservableCollection<CardViewModel>();
-        //    // Initialize Commands
-        //    NewGameCommand = new RelayCommand<object>(ExecuteNewGame);
-        //    SelectCategoryCommand = new RelayCommand<string>(ExecuteSelectCategory);
-        //    SetStandardOptionsCommand = new RelayCommand<object>(ExecuteSetStandardOptions);
-        //    SetCustomOptionsCommand = new RelayCommand<object>(ExecuteSetCustomOptions, CanExecuteSetCustomOptions); // Add CanExecute later if needed
-        //    ExitCommand = new RelayCommand<object>(ExecuteExit);
-        //    AboutCommand = new RelayCommand<object>(ExecuteAbout);
-        //    // TODO: Initialize other commands (Options, Save, Load etc.)
-        //    _currentlyFlippedCards = new List<CardViewModel>(2);
-
-        //    InitializeTimer();
-        //}
 
         public GameViewModel(User currentUser, Action<string, bool> updateStatsAction)
         {
@@ -174,7 +153,8 @@ namespace MemoryGameWPF.ViewModels
             SetCustomOptionsCommand = new RelayCommand<object>(ExecuteSetCustomOptions, CanExecuteSetCustomOptions); // Add CanExecute later if needed
             ExitCommand = new RelayCommand<object>(ExecuteExit);
             AboutCommand = new RelayCommand<object>(ExecuteAbout);
-            // TODO: Initialize other commands (Options, Save, Load etc.)
+            SaveGameCommand = new RelayCommand<object>(ExecuteSaveGame, CanExecuteSaveGame);
+            OpenGameCommand = new RelayCommand<object>(ExecuteOpenGame);
             _currentlyFlippedCards = new List<CardViewModel>(2);
 
             ShowStatisticsCommand = new RelayCommand<object>(ExecuteShowStatistics); // Initialize new command
@@ -252,6 +232,184 @@ namespace MemoryGameWPF.ViewModels
         private void ExecuteNewGame(object parameter)
         {
             InitializeNewGame();
+        }
+
+        // Method to populate ViewModel from a loaded GameState
+        private void LoadState(GameState state)
+        {
+            if (state == null) return; // Or throw?
+
+            // Stop current game processes
+            StopTimer();
+            _currentlyFlippedCards.Clear();
+            _isCheckingPair = false;
+
+            // Restore configuration (Username should match CurrentUser ideally)
+            if (CurrentUser.UserName != state.UserName)
+            {
+                MessageBox.Show($"Warning: Loading game saved by '{state.UserName}' as user '{CurrentUser.UserName}'.", "User Mismatch", MessageBoxButton.OK, MessageBoxImage.Warning);
+                // Potentially prevent loading or adjust CurrentUser? For now, just warn.
+            }
+            SelectedCategory = state.SelectedCategory; // Update property (will trigger path loading)
+            // Assuming Rows/Columns are now settable properties:
+            // Rows = state.Rows;
+            // Columns = state.Columns;
+            // If Rows/Columns are still fixed to 4x4, you might only allow loading 4x4 saves
+            if (state.Rows != this.Rows || state.Columns != this.Columns)
+            {
+                MessageBox.Show($"Cannot load game: Save file has dimensions {state.Rows}x{state.Columns}, but current options are {this.Rows}x{this.Columns}.", "Dimension Mismatch", MessageBoxButton.OK, MessageBoxImage.Error);
+                InitializeNewGame(); // Start a default new game instead?
+                return;
+            }
+
+
+            // Restore Board
+            GameBoardCards.Clear();
+            if (state.BoardCardStates != null)
+            {
+                foreach (var cardState in state.BoardCardStates)
+                {
+                    // Create CardViewModel from saved state, passing the click handler
+                    var cardVM = new CardViewModel(cardState.CardId, cardState.ImagePath, HandleCardClicked)
+                    {
+                        IsFlipped = cardState.IsFlipped,
+                        IsMatched = cardState.IsMatched
+                    };
+                    GameBoardCards.Add(cardVM);
+                }
+            }
+
+            // Restore Timer
+            TimeRemaining = TimeSpan.FromTicks(state.TimeRemainingTicks);
+            _isGameActive = state.IsGameActive; // Store if timer should be running
+            if (_isGameActive)
+            {
+                StartTimer(); // Start timer only if it was active in saved state
+            }
+            else
+            {
+                // Ensure timer UI updates even if not started (e.g., game already won/lost)
+                OnPropertyChanged(nameof(TimeRemaining));
+                OnPropertyChanged(nameof(TimeRemainingFormatted));
+            }
+
+            // TODO: Restore other state (Moves, Score, _currentlyFlippedCards if saving mid-turn)
+
+            System.Diagnostics.Debug.WriteLine($"Game state loaded. Timer Active: {_isGameActive}, Time Left: {TimeRemaining}");
+        }
+
+        // --- Command Execute Methods ---
+
+        private void ExecuteSaveGame(object parameter)
+        {
+            if (!_isGameActive && !GameBoardCards.Any(c => c.IsFlipped && !c.IsMatched))
+            {
+                // Optional: Prevent saving if game isn't started, or is already won/lost/timed out
+                // Or allow saving anytime the board has cards? Your choice.
+                // MessageBox.Show("No active game to save.", "Save Game", MessageBoxButton.OK, MessageBoxImage.Information);
+                // return;
+            }
+            // Stop timer temporarily while saving? Usually not necessary for this data.
+            // StopTimer();
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Memory Game Save (*.mgs)|*.mgs|All Files (*.*)|*.*";
+            // Default filename based on user
+            saveFileDialog.FileName = $"{CurrentUser.UserName}_MemoryGame_{DateTime.Now:yyyyMMddHHmm}.mgs";
+            // Suggest initial directory (e.g., Documents or BaseDirectory)
+            // saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            saveFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string filePath = saveFileDialog.FileName;
+                try
+                {
+                    // 1. Create GameState object from current ViewModel state
+                    GameState currentState = new GameState
+                    {
+                        UserName = CurrentUser.UserName,
+                        SelectedCategory = this.SelectedCategory,
+                        Rows = this.Rows,
+                        Columns = this.Columns,
+                        BoardCardStates = this.GameBoardCards.Select(vm => new CardState(vm)).ToList(), // Convert VMs to States
+                        TimeRemainingTicks = this.TimeRemaining.Ticks,
+                        IsGameActive = this._isGameActive // Save if timer was running
+                        // TODO: Add Moves, Score etc. if implemented
+                    };
+
+                    // 2. Serialize GameState to JSON
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    string json = JsonSerializer.Serialize(currentState, options);
+
+                    // 3. Write JSON to selected file
+                    File.WriteAllText(filePath, json);
+
+                    _currentSaveFilePath = filePath; // Remember where we saved last
+                    MessageBox.Show($"Game saved successfully to:\n{filePath}", "Game Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error saving game to {filePath}:\n{ex.Message}", "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    // Restart timer if it was stopped only for saving
+                    // if (_isGameActive) StartTimer();
+                }
+            }
+        }
+
+        private bool CanExecuteSaveGame(object parameter)
+        {
+            // Allow saving only if there are cards on the board
+            // You could add more conditions (e.g., game not already won/lost)
+            bool boardHasCards = GameBoardCards != null && GameBoardCards.Count > 0;
+            // Optional: Add check for game not finished
+            // bool gameInProgress = _isGameActive || (_currentlyFlippedCards.Count > 0) || !GameBoardCards.All(c => c.IsMatched);
+            // return boardHasCards && gameInProgress;
+
+            return boardHasCards; // Current simple logic
+        }
+
+        private void ExecuteOpenGame(object parameter)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Memory Game Save (*.mgs)|*.mgs|All Files (*.*)|*.*";
+            // Suggest initial directory
+            // openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string filePath = openFileDialog.FileName;
+                try
+                {
+                    // 1. Read JSON from file
+                    string json = File.ReadAllText(filePath);
+
+                    // 2. Deserialize JSON to GameState object
+                    GameState loadedState = JsonSerializer.Deserialize<GameState>(json);
+
+                    if (loadedState != null)
+                    {
+                        // 3. Load the state into the ViewModel
+                        LoadState(loadedState);
+                        _currentSaveFilePath = filePath; // Remember path of loaded game
+                        MessageBox.Show($"Game loaded successfully from:\n{filePath}", "Game Loaded", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Failed to load game data from file:\n{filePath}\nFile might be empty or corrupted.", "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading game from {filePath}:\n{ex.Message}", "Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void InitializeTimer()
@@ -520,6 +678,8 @@ namespace MemoryGameWPF.ViewModels
                 // Make sure FlipCardCommand CanExecute is re-evaluated if it depends on IsEnabled property
                 card.FlipCardCommand.RaiseCanExecuteChanged();
             }
+
+            SaveGameCommand.RaiseCanExecuteChanged();
 
             System.Diagnostics.Debug.WriteLine($"Game board initialized with {GameBoardCards.Count} cards. Timer started.");
         }
