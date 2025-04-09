@@ -13,16 +13,13 @@ namespace MemoryGameWPF.Models
         private string imagePath;
         public string ImagePath { get { return imagePath; } set { imagePath = value; OnPropertyChanged(nameof(ImagePath)); } }
 
-        public User(string userName, string imagePath) // Constructor for easier User creation
+        public User(string userName, string imagePath)
         {
             UserName = userName;
             ImagePath = imagePath;
         }
 
-        public User() // Default constructor (needed for some serialization)
-        {
-
-        }
+        public User() { }
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

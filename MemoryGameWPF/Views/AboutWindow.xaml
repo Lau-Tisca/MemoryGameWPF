@@ -9,7 +9,6 @@
         WindowStartupLocation="CenterOwner" 
         ResizeMode="NoResize"
         ShowInTaskbar="False">
-    <!-- Optional: Don't show separate taskbar icon -->
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

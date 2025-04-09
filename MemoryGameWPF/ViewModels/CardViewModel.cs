@@ -1,5 +1,4 @@
-﻿// ViewModels/CardViewModel.cs
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -13,15 +12,12 @@ namespace MemoryGameWPF.ViewModels
         private readonly Action<CardViewModel> _cardClickedCallback; // Action to notify GameViewModel
 
         // --- Properties ---
-
-        // ID to identify matching cards (e.g., the unique ID of the image source)
         public int CardId { get; }
 
         private string _imagePath;
         public string ImagePath
         {
             get => _imagePath;
-            // Typically set once during creation
             private set { _imagePath = value; OnPropertyChanged(); }
         }
 
@@ -49,7 +45,6 @@ namespace MemoryGameWPF.ViewModels
                 {
                     _isMatched = value;
                     OnPropertyChanged();
-                    // When matched, re-evaluate CanExecuteFlipCard (to disable)
                     FlipCardCommand.RaiseCanExecuteChanged();
                 }
             }
@@ -76,7 +71,6 @@ namespace MemoryGameWPF.ViewModels
         // --- Command Methods ---
         private void ExecuteFlipCard(object parameter)
         {
-            // Notify the main GameViewModel that this card was clicked
             _cardClickedCallback(this);
         }
 

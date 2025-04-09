@@ -9,7 +9,6 @@
         mc:Ignorable="d"
         Title="Memory Game" Height="600" Width="800"
         d:DataContext="{d:DesignInstance Type=viewModels:GameViewModel, IsDesignTimeCreatable=False}">
-    <!-- Design time DataContext -->
 
     <Window.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
@@ -28,16 +27,13 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
                 <MenuItem Header="_Category">
-                    <!-- Option 1: Static Items (Simpler for fixed categories) -->
                     <MenuItem Header="_Animals" Command="{Binding SelectCategoryCommand}" CommandParameter="Animals"/>
                     <MenuItem Header="_Nature" Command="{Binding SelectCategoryCommand}" CommandParameter="Nature"/>
                     <MenuItem Header="_Objects" Command="{Binding SelectCategoryCommand}" CommandParameter="Objects"/>
                 </MenuItem>
-            <MenuItem Header="_Options">
-                <!-- Add Options menu items later (Standard, Custom) -->
-                <MenuItem Header="_Standard (4x4)" Command="{Binding SetStandardOptionsCommand}"/>
-                <MenuItem Header="_Custom..." Command="{Binding SetCustomOptionsCommand}"/>
-                <!-- Add placeholders for Open/Save/Stats later -->
+                <MenuItem Header="_Options">
+                    <MenuItem Header="_Standard (4x4)" Command="{Binding SetStandardOptionsCommand}"/>
+                    <MenuItem Header="_Custom..." Command="{Binding SetCustomOptionsCommand}"/>
                     <MenuItem Header="_Open Game" Command="{Binding OpenGameCommand}"/>
                 <MenuItem Header="_Save Game" Command="{Binding SaveGameCommand}"/>
                 <MenuItem Header="_Statistics" Command="{Binding ShowStatisticsCommand}"/>
@@ -45,7 +41,6 @@
                 <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
                 <MenuItem Header="_Help">
-                    <!-- Add Help menu items later (About) -->
                     <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
                 </MenuItem>
             </MenuItem>
@@ -54,42 +49,26 @@
 
         <!-- Game Board Area -->
         <ItemsControl Grid.Row="1" ItemsSource="{Binding GameBoardCards}" Margin="10">
-            <!-- Panel to arrange items in a grid -->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <!-- UniformGrid automatically adjusts cell size -->
-                    <!-- Bind Columns to the ViewModel property -->
                     <UniformGrid Rows="{Binding Rows}" Columns="{Binding Columns}" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
-            <!-- How each card (CardViewModel) should look -->
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type viewModels:CardViewModel}">
-                    <!-- Specify DataType for better tooling -->
                     <Button Command="{Binding FlipCardCommand}"
                 Height="80" Width="80" Margin="5" Padding="0"
                 x:Name="CardButton">
-                        <!-- Give the button a name if needed for Style Setters -->
-
-                        <!-- Define a Style specifically for this button within the DataTemplate -->
                         <Button.Style>
                             <Style TargetType="Button">
-                                <!-- Set default IsEnabled based on IsMatched initially -->
-                                <!-- Note: Command's CanExecute will also influence IsEnabled -->
                                 <Setter Property="IsEnabled" Value="{Binding IsMatched, Converter={StaticResource InverseBooleanConverter}}"/>
-                                <!-- Optional: Set default Opacity -->
                                 <Setter Property="Opacity" Value="1.0"/>
 
                                 <Style.Triggers>
-                                    <!-- Trigger to disable and fade when matched -->
                                     <DataTrigger Binding="{Binding IsMatched}" Value="True">
-                                        <!-- Option 1: Make matched cards semi-transparent -->
                                         <Setter Property="Opacity" Value="0.3"/>
-                                        <!-- Disable button when matched (redundant if CanExecute handles it, but safe) -->
                                         <Setter Property="IsEnabled" Value="False"/>
-                                        <!-- Option 2: Collapse (handled differently, usually via Visibility on container) -->
-                                        <!-- Option 3: Show overlay (would need overlay element and trigger its visibility) -->
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -97,8 +76,6 @@
 
                         <!-- Content of the Button -->
                         <Grid Background="Transparent">
-                            <!-- Card Back (Visible when not flipped) -->
-                            <!-- Use a Style with Trigger for visibility based on IsFlipped -->
                             <Border Background="CornflowerBlue" CornerRadius="5">
                                 <Border.Style>
                                     <Style TargetType="Border">
@@ -115,7 +92,6 @@
                             </Border>
 
                             <!-- Card Image (Visible when flipped and not matched) -->
-                            <!-- Use a Style with Trigger for visibility based on IsFlipped -->
                             <Image Source="{Binding ImagePath}" Stretch="Uniform" x:Name="CardImage">
                                 <Image.Style>
                                     <Style TargetType="Image">

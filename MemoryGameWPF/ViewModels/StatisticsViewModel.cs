@@ -1,19 +1,17 @@
 ﻿using MemoryGameWPF.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Windows; // For MessageBox
+using System.Windows;
 
 namespace MemoryGameWPF.ViewModels
 {
     public class StatisticsViewModel : INotifyPropertyChanged
     {
-        private const string StatsDataFileName = "game_stats.json"; // Must match SignInViewModel
+        private const string StatsDataFileName = "game_stats.json";
         private readonly string _statsDataFilePath;
 
         private ObservableCollection<StatisticsEntryViewModel> _statisticsEntries;
@@ -33,12 +31,10 @@ namespace MemoryGameWPF.ViewModels
         private void LoadAndPrepareStatistics()
         {
             Dictionary<string, UserStats> allUserStats = null;
-            StatisticsEntries.Clear(); // Clear previous entries
 
-            // Load the raw data
             if (!File.Exists(_statsDataFilePath))
             {
-                allUserStats = new Dictionary<string, UserStats>(); // Empty if file doesn't exist
+                allUserStats = new Dictionary<string, UserStats>();
             }
             else
             {
@@ -55,7 +51,6 @@ namespace MemoryGameWPF.ViewModels
                 }
             }
 
-            // Prepare entries for display, sorted by Games Won (descending) then Played (descending)
             var sortedEntries = allUserStats
                 .Select(kvp => new StatisticsEntryViewModel
                 {
@@ -65,7 +60,7 @@ namespace MemoryGameWPF.ViewModels
                 })
                 .OrderByDescending(entry => entry.GamesWon)
                 .ThenByDescending(entry => entry.GamesPlayed)
-                .ThenBy(entry => entry.UserName); // Alphabetical for ties
+                .ThenBy(entry => entry.UserName);
 
             foreach (var entry in sortedEntries)
             {
@@ -75,13 +70,10 @@ namespace MemoryGameWPF.ViewModels
             if (!StatisticsEntries.Any())
             {
                 System.Diagnostics.Debug.WriteLine("No statistics data found to display.");
-                // Optional: Add a dummy entry or message for empty stats?
-                // StatisticsEntries.Add(new StatisticsEntryViewModel { UserName = "No statistics yet." });
             }
         }
 
 
-        // --- INotifyPropertyChanged Implementation ---
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

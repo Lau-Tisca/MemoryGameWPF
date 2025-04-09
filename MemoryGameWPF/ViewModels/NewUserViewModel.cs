@@ -16,7 +16,7 @@ namespace MemoryGameWPF.ViewModels
 {
     public class NewUserViewModel : INotifyPropertyChanged
     {
-        private readonly ObservableCollection<User> _usersCollection; // Reference to the main Users list
+        private readonly ObservableCollection<User> _usersCollection;
         private readonly Func<bool> _saveAction; // Delegate to call the SaveUsers method in SignInViewModel
 
         private string _userName;
@@ -39,7 +39,7 @@ namespace MemoryGameWPF.ViewModels
             {
                 _selectedImagePath = value;
                 OnPropertyChanged();
-                LoadImagePreview(); // Load and set ImageSource when path changes
+                LoadImagePreview();
                 SaveUserCommand.RaiseCanExecuteChanged();
             }
         }
@@ -65,7 +65,6 @@ namespace MemoryGameWPF.ViewModels
             SaveUserCommand = new RelayCommand<object>(ExecuteSaveUser, CanExecuteSaveUser);
             CancelNewUserCommand = new RelayCommand<object>(ExecuteCancelNewUser);
 
-            // Initialize with default values if needed
             UserName = "";
             SelectedImagePath = "";
             SelectedImageSource = null;
@@ -77,7 +76,7 @@ namespace MemoryGameWPF.ViewModels
             _saveAction = saveAction ?? throw new ArgumentNullException(nameof(saveAction));
 
             BrowseImageCommand = new RelayCommand<object>(ExecuteBrowseImage);
-            SaveUserCommand = new RelayCommand<object>(ExecuteSaveUser, CanExecuteSaveUser); // Add CanExecute
+            SaveUserCommand = new RelayCommand<object>(ExecuteSaveUser, CanExecuteSaveUser);
             CancelNewUserCommand = new RelayCommand<object>(ExecuteCancelNewUser);
 
             UserName = "";
@@ -99,52 +98,37 @@ namespace MemoryGameWPF.ViewModels
 
         private void ExecuteSaveUser(object parameter)
         {
-            // 1. Validate UserName
             if (string.IsNullOrWhiteSpace(UserName))
             {
                 MessageBox.Show("Username cannot be empty.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            // Add uniqueness check
             if (_usersCollection.Any(u => u.UserName.Equals(UserName, StringComparison.OrdinalIgnoreCase)))
             {
                 MessageBox.Show($"Username '{UserName}' already exists. Please choose another.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            // Validate image selection (optional, depending on requirements)
             if (string.IsNullOrEmpty(SelectedImagePath))
             {
                 MessageBox.Show("Please select an image for the user.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            // 2. TODO: Copy selected image to a local application folder (BEST PRACTICE)
-            //    - Create an "Avatars" or "UserImages" folder within your app's data directory.
-            //    - Generate a unique filename (e.g., using Guid or username + timestamp).
-            //    - Copy the file from SelectedImagePath to the new location.
-            //    - Update SelectedImagePath to the *new* relative path within your app's folder.
-            //    - This prevents issues if the user later moves or deletes the original image.
-            //    - For now, we'll just use the original path, but be aware of this limitation.
-            string imagePathToSave = SelectedImagePath; // Placeholder - implement copying later
+            string imagePathToSave = SelectedImagePath;
 
-            // 3. Create new User object
             User newUser = new User(UserName, imagePathToSave);
 
-            // 4. Add the new user to the shared Users collection
             _usersCollection.Add(newUser);
 
-            // 5. Call the SaveAction delegate to trigger saving in SignInViewModel
-            if (_saveAction()) // Check if save was successful
+            if (_saveAction())
             {
                 MessageBox.Show($"User '{UserName}' created successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                CloseWindow(parameter, true); // Close window after successful save
+                CloseWindow(parameter, true); 
             }
             else
             {
-                // Save failed, remove the user we just added to keep consistency
                 _usersCollection.Remove(newUser);
                 MessageBox.Show($"Failed to save user data. User '{UserName}' was not created.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Don't close the window if save failed
             }
         }
 
@@ -157,7 +141,7 @@ namespace MemoryGameWPF.ViewModels
 
         private void ExecuteCancelNewUser(object parameter)
         {
-            CloseWindow(parameter, false); // Close window, indicating cancellation
+            CloseWindow(parameter, false);
         }
 
         private void CloseWindow(object parameter, bool dialogResult)
@@ -213,14 +197,13 @@ namespace MemoryGameWPF.ViewModels
                 {
                     BitmapImage bitmap = new BitmapImage();
                     bitmap.BeginInit();
-                    // Use Absolute URI for files outside the project during selection
                     bitmap.UriSource = new Uri(SelectedImagePath, UriKind.Absolute);
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad; // Load immediately
-                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache; // Try ignoring cache
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
                     bitmap.EndInit();
-                    SelectedImageSource = bitmap; // Assign to the bound property
+                    SelectedImageSource = bitmap;
                 }
-                catch (Exception ex) // Catch more general exceptions during debugging
+                catch (Exception ex) 
                 {
                     System.Windows.MessageBox.Show($"Error loading image preview:\n{SelectedImagePath}\n{ex.Message}", "Image Preview Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     SelectedImageSource = null;

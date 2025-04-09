@@ -1,19 +1,16 @@
 ﻿using MemoryGameWPF.Models;
 using MemoryGameWPF.Views;
 using System;
-using System.Collections.Generic; // For List
-using System.Collections.ObjectModel; // For ObservableCollection
+using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO; // For Path
-using System.Linq; // For LINQ methods like Select, Take, etc.
+using System.IO;
 using System.Runtime.CompilerServices;
-using System.Windows.Input; // For ICommand (later)
-using System.Reflection; // For Assembly.GetExecutingAssembly (optional, for pathing)
+using System.Windows.Input;
+using System.Reflection;
 using GalaSoft.MvvmLight.Command;
-using System.Windows; // For RelayCommand (optional, for command binding)
-using System.Threading.Tasks; // For Task.Delay
-using System.Windows.Threading; // For DispatcherTimer
-using Microsoft.Win32; // For SaveFileDialog, OpenFileDialog
+using System.Windows;
+using System.Windows.Threading;
+using Microsoft.Win32;
 using System.Text.Json;
 
 namespace MemoryGameWPF.ViewModels
