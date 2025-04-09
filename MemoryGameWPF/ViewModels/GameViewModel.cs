@@ -23,6 +23,7 @@ namespace MemoryGameWPF.ViewModels
         private readonly Random _random = new Random(); // For shuffling
         private List<CardViewModel> _currentlyFlippedCards = new List<CardViewModel>(); // Track flipped cards
         private bool _isCheckingPair = false; // Flag to prevent clicking during pair check delay
+        private readonly Action<string, bool> _updateStatsAction;
 
         // Timer Fields
         private DispatcherTimer _gameTimer;
@@ -44,7 +45,6 @@ namespace MemoryGameWPF.ViewModels
         public User CurrentUser
         {
             get => _currentUser;
-            // Typically CurrentUser doesn't change during a game session
             private set { _currentUser = value; OnPropertyChanged(); }
         }
 
@@ -67,8 +67,6 @@ namespace MemoryGameWPF.ViewModels
                 {
                     _selectedCategory = value;
                     OnPropertyChanged();
-                    // Optionally, trigger a new game or reset when category changes?
-                    // Or just use this value when "New Game" is clicked.
                     LoadImagePathsForCategory(); // Load paths for the selected category
                 }
             }
@@ -119,13 +117,44 @@ namespace MemoryGameWPF.ViewModels
         public RelayCommand<object> SetCustomOptionsCommand { get; } // Placeholder
         public RelayCommand<object> ExitCommand { get; }
         public RelayCommand<object> AboutCommand { get; }
+        public RelayCommand<object> ShowStatisticsCommand { get; }
 
         #endregion
 
         #region Constructor
-        public GameViewModel(User currentUser)
+        //public GameViewModel(User currentUser)
+        //{
+        //    CurrentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+        //    WelcomeMessage = $"Welcome, {CurrentUser.UserName}! Select options and start a new game!";
+
+        //    // Initialize Categories
+        //    AvailableCategories = new List<string> { "Animals", "Nature", "Objects" }; // Match your folder names
+        //    SelectedCategory = AvailableCategories.FirstOrDefault(); // Select the first category by default
+
+        //    // Load initial image paths
+        //    _availableImagePaths = new List<string>();
+        //    LoadImagePathsForCategory();
+
+        //    // Inside GameViewModel constructor
+        //    GameBoardCards = new ObservableCollection<CardViewModel>();
+        //    // Initialize Commands
+        //    NewGameCommand = new RelayCommand<object>(ExecuteNewGame);
+        //    SelectCategoryCommand = new RelayCommand<string>(ExecuteSelectCategory);
+        //    SetStandardOptionsCommand = new RelayCommand<object>(ExecuteSetStandardOptions);
+        //    SetCustomOptionsCommand = new RelayCommand<object>(ExecuteSetCustomOptions, CanExecuteSetCustomOptions); // Add CanExecute later if needed
+        //    ExitCommand = new RelayCommand<object>(ExecuteExit);
+        //    AboutCommand = new RelayCommand<object>(ExecuteAbout);
+        //    // TODO: Initialize other commands (Options, Save, Load etc.)
+        //    _currentlyFlippedCards = new List<CardViewModel>(2);
+
+        //    InitializeTimer();
+        //}
+
+        public GameViewModel(User currentUser, Action<string, bool> updateStatsAction)
         {
             CurrentUser = currentUser ?? throw new ArgumentNullException(nameof(currentUser));
+            _updateStatsAction = updateStatsAction ?? throw new ArgumentNullException(nameof(updateStatsAction)); // Store the delegate
+
             WelcomeMessage = $"Welcome, {CurrentUser.UserName}! Select options and start a new game!";
 
             // Initialize Categories
@@ -148,7 +177,8 @@ namespace MemoryGameWPF.ViewModels
             // TODO: Initialize other commands (Options, Save, Load etc.)
             _currentlyFlippedCards = new List<CardViewModel>(2);
 
-            InitializeTimer();
+            ShowStatisticsCommand = new RelayCommand<object>(ExecuteShowStatistics); // Initialize new command
+            InitializeTimer(); // Make sure timer is initialized
         }
         #endregion
 
@@ -284,12 +314,30 @@ namespace MemoryGameWPF.ViewModels
 
                 MessageBox.Show($"Sorry {CurrentUser.UserName}, you ran out of time!", "Game Over", MessageBoxButton.OK, MessageBoxImage.Stop);
 
-                // TODO: Update statistics (played game, but didn't win)
-                // UpdateStats(won: false);
+                _updateStatsAction(CurrentUser.UserName, false);
             }
         }
 
-        // Add these methods to the Methods region in GameViewModel.cs
+        private void ExecuteShowStatistics(object parameter)
+        {
+            // TODO: Implement showing the statistics window
+            // 1. Need to get the latest stats data (maybe load it again, or pass it somehow?)
+            //    For simplicity now, we might just load it again inside StatisticsViewModel
+            // 2. Create StatisticsViewModel
+            // 3. Create StatisticsWindow
+            // 4. Set DataContext
+            // 5. ShowDialog
+
+            StatisticsViewModel statsViewModel = new StatisticsViewModel(); // It will load data itself
+            StatisticsWindow statsWindow = new StatisticsWindow();
+            statsWindow.DataContext = statsViewModel;
+
+            // Set owner
+            Window owner = Application.Current.Windows.OfType<GameWindow>().FirstOrDefault(w => w.DataContext == this);
+            if (owner != null) statsWindow.Owner = owner;
+
+            statsWindow.ShowDialog();
+        }
 
         private void ExecuteSelectCategory(string categoryName)
         {
@@ -331,12 +379,12 @@ namespace MemoryGameWPF.ViewModels
 
             MessageBox.Show("Custom Options dialog not yet implemented.", "TODO", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
         private bool CanExecuteSetCustomOptions(object parameter)
         {
             // TODO: Return false if custom options feature is disabled
             return true; // Enable for now, even if not implemented
         }
-
 
         private void ExecuteExit(object parameter)
         {
@@ -569,10 +617,9 @@ namespace MemoryGameWPF.ViewModels
             if (allMatched && GameBoardCards.Any() && _isGameActive) // Only count win if game was active
             {
                 System.Diagnostics.Debug.WriteLine("Game Won!");
-                StopTimer(); // Stop timer on win
-                // TODO: Display win message, update statistics
+                StopTimer(); 
                 MessageBox.Show($"Congratulations {CurrentUser.UserName}, you won!\nTime remaining: {TimeRemaining:mm\\:ss}", "You Won!", MessageBoxButton.OK, MessageBoxImage.Information);
-                // UpdateStats(won: true);
+                _updateStatsAction(CurrentUser.UserName, true);
             }
         }
 
